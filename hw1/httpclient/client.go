@@ -60,7 +60,13 @@ func ReadBody(res *http.Response) ([]byte, error) {
 	defer res.Body.Close()
 	scanner := bufio.NewScanner(res.Body)
 
-	var data []byte = nil
+	// Manually increase the scanner buffer size so we can read more repos and not throw
+	maxBuffSize := 1024 * 1024
+	buff := make([]byte, 0, maxBuffSize)
+	scanner.Buffer(buff, maxBuffSize)
+
+	data := make([]byte, 0)
+
 	for scanner.Scan() {
 		data = append(data, scanner.Bytes()...)
 	}
